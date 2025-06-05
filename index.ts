@@ -3,6 +3,7 @@ import cors from 'cors'; // ⬅️ Añadido
 import { connectToDatabase } from './db';
 import { getProducts } from './getProducts';
 import { insertReview } from './insertReview'; // Asegúrate de la ruta correcta
+import { getComments } from './getReviews';
 
 const app = express();
 const PORT = 3000;
@@ -17,6 +18,7 @@ app.use(cors());
 
 app.use(express.json());
 
+
 app.get('/api/products', async (req, res) => {
   try {
     console.log("Connecting to database");
@@ -26,6 +28,22 @@ app.get('/api/products', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener productos:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// GET comentarios por ID de producto
+app.get('/api/comments/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    
+    const db = await connectToDatabase();
+    // Asumiendo que tienes tu instancia de db disponible
+    const comments = await getComments(db, 'comments', productId);
+    
+    res.json(comments);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'Error al obtener comentarios' });
   }
 });
 
