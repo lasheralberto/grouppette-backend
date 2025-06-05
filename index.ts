@@ -1,17 +1,25 @@
-// server.ts
 import express from 'express';
+import cors from 'cors'; // ⬅️ Añadido
 import { connectToDatabase } from './db';
 import { getProducts } from './getProducts';
 
 const app = express();
-const PORT =  3000;
+const PORT = 3000;
+
+// 🛡️ Habilitar CORS (permite todas las peticiones CORS)
+app.use(cors());
+
+// O bien, restringe a tu frontend solo:
+// app.use(cors({
+//   origin: 'https://jubilant-space-waffle-9wr4w474w9ghx99r-8080.app.github.dev'
+// }));
 
 app.use(express.json());
 
 app.get('/api/products', async (req, res) => {
   try {
     const db = await connectToDatabase();
-    const products = await getProducts(db, 'collection'); // Asegúrate de que "products" es el nombre de tu colección
+    const products = await getProducts(db, 'collection'); // Asegúrate del nombre real de la colección
     res.json(products);
   } catch (error) {
     console.error('Error al obtener productos:', error);
