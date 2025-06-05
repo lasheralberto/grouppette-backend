@@ -12,17 +12,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// server.ts
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors")); // ⬅️ Añadido
 const db_1 = require("./db");
 const getProducts_1 = require("./getProducts");
 const app = (0, express_1.default)();
 const PORT = 3000;
+// 🛡️ Habilitar CORS (permite todas las peticiones CORS)
+app.use((0, cors_1.default)());
+// O bien, restringe a tu frontend solo:
+// app.use(cors({
+//   origin: 'https://jubilant-space-waffle-9wr4w474w9ghx99r-8080.app.github.dev'
+// }));
 app.use(express_1.default.json());
 app.get('/api/products', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log("Connecting to database");
         const db = yield (0, db_1.connectToDatabase)();
-        const products = yield (0, getProducts_1.getProducts)(db, 'collection'); // Asegúrate de que "products" es el nombre de tu colección
+        const products = yield (0, getProducts_1.getProducts)(db, 'collection'); // Asegúrate del nombre real de la colección
         res.json(products);
     }
     catch (error) {
@@ -31,5 +38,5 @@ app.get('/api/products', (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 }));
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`🚀 Servidor corriendo dd en http://localhost:${PORT}`);
 });

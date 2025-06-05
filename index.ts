@@ -18,6 +18,7 @@ app.use(express.json());
 
 app.get('/api/products', async (req, res) => {
   try {
+    console.log("Connecting to database");
     const db = await connectToDatabase();
     const products = await getProducts(db, 'collection'); // Asegúrate del nombre real de la colección
     res.json(products);
@@ -28,5 +29,5 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo dd en http://localhost:${PORT}`);
 });
