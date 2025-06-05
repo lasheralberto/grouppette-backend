@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors'; // ⬅️ Añadido
 import { connectToDatabase } from './db';
 import { getProducts } from './getProducts';
+import { insertReview } from './insertReview'; // Asegúrate de la ruta correcta
 
 const app = express();
 const PORT = 3000;
@@ -27,6 +28,45 @@ app.get('/api/products', async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+
+app.post('/api/comments', async (reqe, rese) => {
+  try {
+    console.log('Connecting to database');
+    const db = await connectToDatabase();
+
+    const { id, user, rating, date, comment, verified } = reqe.body;
+
+    if (
+      typeof id !== 'number' ||
+      typeof user !== 'string' ||
+      typeof rating !== 'number' ||
+      typeof comment !== 'string' ||
+      typeof verified !== 'boolean'
+    ) {
+      //return rese.status(400).json({ error: 'Datos inválidos en la solicitud' });
+    }
+
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      //return rese.status(400).json({ error: 'Fecha inválida' });
+    }
+
+    const result = await insertReview(db, 'comentarios', {
+      id,
+      user,
+      rating,
+      date: parsedDate,
+      comment,
+      verified
+    });
+
+    rese.status(201).json({ insertedId: result.insertedId });
+  } catch (error) {
+    console.error('Error al insertar comentario:', error);
+    rese.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo dd en http://localhost:${PORT}`);

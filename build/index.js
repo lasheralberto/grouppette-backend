@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors")); // ⬅️ Añadido
 const db_1 = require("./db");
 const getProducts_1 = require("./getProducts");
+const insertReview_1 = require("./insertReview"); // Asegúrate de la ruta correcta
 const app = (0, express_1.default)();
 const PORT = 3000;
 // 🛡️ Habilitar CORS (permite todas las peticiones CORS)
@@ -35,6 +36,37 @@ app.get('/api/products', (req, res) => __awaiter(void 0, void 0, void 0, functio
     catch (error) {
         console.error('Error al obtener productos:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}));
+app.post('/api/comments', (reqe, rese) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log('Connecting to database');
+        const db = yield (0, db_1.connectToDatabase)();
+        const { id, user, rating, date, comment, verified } = reqe.body;
+        if (typeof id !== 'number' ||
+            typeof user !== 'string' ||
+            typeof rating !== 'number' ||
+            typeof comment !== 'string' ||
+            typeof verified !== 'boolean') {
+            //return rese.status(400).json({ error: 'Datos inválidos en la solicitud' });
+        }
+        const parsedDate = new Date(date);
+        if (isNaN(parsedDate.getTime())) {
+            //return rese.status(400).json({ error: 'Fecha inválida' });
+        }
+        const result = yield (0, insertReview_1.insertReview)(db, 'comentarios', {
+            id,
+            user,
+            rating,
+            date: parsedDate,
+            comment,
+            verified
+        });
+        rese.status(201).json({ insertedId: result.insertedId });
+    }
+    catch (error) {
+        console.error('Error al insertar comentario:', error);
+        rese.status(500).json({ error: 'Error interno del servidor' });
     }
 }));
 app.listen(PORT, () => {
